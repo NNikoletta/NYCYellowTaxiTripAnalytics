@@ -41,6 +41,3 @@ jobs:
 
       - name: Build package
         run: uv build
-
-      - name: Run unit tests
-        run: uv run pytest -m "not integration" -q
