@@ -20,9 +20,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--download", action="store_true", help="Download raw NYC Yellow Taxi Trip Data."
     )
 
-    mode.add_argument(
-        "--run-spark-session", action="store_true", help="Run Spark Session."
-    )
+    mode.add_argument("--run-spark-session", action="store_true", help="Run Spark Session.")
 
     return parser
 
@@ -40,7 +38,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         if args.download:
             download_data()
         if args.run_spark_session:
-            run_spark_pipeline()
+            run_spark_pipeline(filename="yellow_tripdata_2025-01.parquet")
         else:
             logger.info("Please choose a mode.")
     except Exception:

@@ -1,21 +1,27 @@
 import os
 import sys
 
+from nyc_yellow_taxi_trip.config import raw_data_dir
+
 os.environ["PYSPARK_PYTHON"] = sys.executable
 os.environ["PYSPARK_DRIVER_PYTHON"] = sys.executable
 
 from pyspark.sql import SparkSession
 
 
-def run_spark_pipeline():
+def run_spark_pipeline(filename: str):
     spark = (
         SparkSession.builder.appName("YellowTaxiTripAnalyticsApp").master("local[*]").getOrCreate()
     )
 
-    data = [("exmp", 1), ("exmp", 2), ("exmp", 3), ("exmp", 4)]
-    columns = ["Exmp", "Number"]
+    filepath = raw_data_dir / filename
+    if not filepath.is_file():
+        raise FileNotFoundError(f"'{filepath}' does not exist.")
 
-    df = spark.createDataFrame(data, schema=columns)
-    df.show()
+    df = spark.read.parquet(str(filepath))
+    df.createOrReplaceTempView("trips")
+
+    df.printSchema(2)
+    df.show(2)
 
     spark.stop()
