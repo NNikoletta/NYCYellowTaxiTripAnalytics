@@ -19,3 +19,7 @@ Thumbs.db
 .ipynb_checkpoints/
 
 data/raw/
+
+metastore_db
+spark-warehouse
+derby.log
