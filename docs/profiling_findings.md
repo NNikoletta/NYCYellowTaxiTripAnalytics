@@ -6,4 +6,7 @@
 
 **Repository:** 'NNikoletta/NYCYellowTaxiTripAnalytics'
 
-This file intends to document the findings of all the profiling queries that can be found in '[sql/profiling]()'
+This file intends to document the findings of all the profiling queries that can be found in '[sql/profiling](https://github.com/NNikoletta/NYCYellowTaxiTripAnalytics/blob/master/docs/profiling_findings.md)'
+
+## 1. 001_profile_raw_data.sql
+
