@@ -1,5 +1,6 @@
 import os
 import sys
+from pathlib import Path
 
 from nyc_yellow_taxi_trip.config import raw_data_dir
 
@@ -25,3 +26,12 @@ def run_spark_pipeline(filename: str):
     df.show(2)
 
     spark.stop()
+
+
+def run_sql_file(spark, path):
+    file_content = Path(path).read_text()
+    statements = [s.strip() for s in file_content.split(";") if s.strip()]
+    result = None
+    for query in statements:
+        result = spark.sql(query)
+    return result
