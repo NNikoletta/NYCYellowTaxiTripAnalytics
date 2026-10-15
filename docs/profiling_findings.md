@@ -53,7 +53,7 @@ While other queries are needed to ensure there are no empty cells in the tables 
 when creating the staging tables, the data types can be preserved from the raw table.
 
 * **Lookup data:**
-* 
+
 | col_name     | data_type | comment |
 |--------------|-----------|---------|
 | LocationID   | string    | NULL    |
@@ -126,3 +126,39 @@ the trip data cannot be valid.
 
 As expected due to the nature of the data stored in this table, it should not contain any null cells.
 
+### Data anomalies
+
+When collecting data it is often inevitable that data gets mixed up, receives the wrong label, or wrong record etc. 
+To ensure there are no inconsistencies in the final curated dataset, 
+various possible anomalies need to be filtered out in the early stages of data processing.
+
+* **Trip data:**
+
+| check_name                  | invalid_row_count |
+|-----------------------------|-------------------|
+| dropoff_before_pickup       | 124               |
+| outside_of_month            | 22                |
+| trip_over_24h               | 20                |
+| zero_duration_trips         | 1927              |
+| negative_total_amount       | 63037             |
+| negative_credit_card_charge | 15                |
+
+The table above is a result of multiple checks. The first one shows that there are 124 records, where the
+time recorded at drop-off falls before the pickup time saved for the trip. The rows will be excluded as they
+are a clear anomaly and cannot be treated as valid records. The records that show a trip that lasts over 24 hours
+and records with a pickup time that is not in January will be treated the same. However, these rows will not be
+completely discarded, they will remain in a quarantine table.
+
+There are also trips that have a zero duration. As one can notice, this project did not mention deleting these
+records. Because the table contains canceled trips, the records may be used for further analytics, but it is
+important to note their presence when querying the final curated tables.
+
+Normally, one expects a positive value to be assigned to any fare/payment attributes, however, this dataset also
+contains records of refunded trips which are saved with negative amounts. The last two rows of the table above
+show that there are 63037 entries with a negative total amount and 15 of them are tied to credit card payments.
+The last check shows that although there is a separate label for disputed trips, some refunds are recorded
+as the negative of the original row. Discarding one or the other may distort the final metrics, thus they
+will be kept in the main table for now, however, their presence needs to be taken into consideration during
+future calculations. This query does not prove that every negative charge that does not have a disputed label
+has a positive entry to "balance it". This needs to be checked separately and if there are any records with negative charges
+that do not have a clear refund tie or label, they can be treated as anomalies.

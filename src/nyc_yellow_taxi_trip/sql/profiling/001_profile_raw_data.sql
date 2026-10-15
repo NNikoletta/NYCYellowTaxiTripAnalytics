@@ -1,17 +1,19 @@
+---------------------------------------------------
+---ATTRIBUTES AND DATA TYPES
+---------------------------------------------------
 ---Exploring the columns and their types in 'trips'
 DESCRIBE raw.trips;
 
----Exploring an example of data in 'trips'
 SELECT * FROM raw.trips limit 2;
 
 ---Exploring the columns and their types in 'lookup'
 DESCRIBE raw.lookup;
 
----Exploring an example of data in 'lookup'
 SELECT * FROM raw.lookup limit 2;
 
----Checking null cells
-
+---------------------------------------------------
+---NULL CELLS
+---------------------------------------------------
 SELECT * FROM (
     SELECT
         COUNT_IF(VendorID IS NULL) AS VendorID,
@@ -58,3 +60,51 @@ UNPIVOT(
     )
 );
 
+---------------------------------------------------
+---ANOMALIES
+---------------------------------------------------
+SELECT
+    "dropoff_before_pickup" AS check_name,
+    COUNT(*) AS invalid_row_count
+FROM raw.trips
+WHERE tpep_dropoff_datetime < tpep_pickup_datetime
+
+UNION ALL
+
+SELECT
+    "outside_of_month",
+    COUNT(*)
+FROM raw.trips
+WHERE tpep_pickup_datetime < '2025-01-01' OR tpep_pickup_datetime >= '2025-02-01'
+
+UNION ALL
+
+SELECT
+    "trip_over_24h",
+    COUNT(*)
+FROM raw.trips
+WHERE tpep_dropoff_datetime > tpep_pickup_datetime + INTERVAL 24 HOURS
+
+UNION ALL
+
+SELECT
+    "zero_duration_trips",
+    COUNT(*)
+FROM raw.trips
+WHERE tpep_pickup_datetime == tpep_dropoff_datetime
+
+UNION ALL
+
+SELECT
+    "negative_total_amount",
+    COUNT(*)
+FROM raw.trips
+WHERE total_amount < 0
+
+UNION ALL
+
+SELECT
+    "negative_credit_card_charge",
+    COUNT(*)
+FROM raw.trips
+WHERE total_amount < 0 AND payment_type == 1;
