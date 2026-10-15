@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="nyc_yellow_taxi_trip",
-        description="Download, validate, transform, and analyze NYC Yellow Taxi Trip Data",
+        description="Download, transform, and analyze NYC Yellow Taxi Trip Data",
     )
 
     mode = parser.add_mutually_exclusive_group()
@@ -37,7 +37,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     try:
         if args.download:
             download_data()
-        if args.run_spark_session:
+        elif args.run_spark_session:
             run_spark_pipeline()
         else:
             logger.info("Please choose a mode.")
